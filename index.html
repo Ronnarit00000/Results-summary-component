@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Frontend Mentor | Results summary component</title>
+
+  <link rel="icon" type="image/png" sizes="32x32" href="./assets/images/favicon-32x32.png">
+
+  <!-- import google font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+
+  <!-- main style -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- start result-summary -->
+  <div class="result-summary">
+    <!-- start result  -->
+    <section class="result" id="result"></section>
+    <!-- end result  -->
+    
+    <!-- start summary  -->
+    <section class="summary" id = "summary">
+      <h4  class="summaryTitle">Summary</h4>
+      <div class="summaryList" id="summaryList" ></div>
+      <a   class="btn" id="btncontinue" href="#">Continue</a>
+    </section>
+    <!-- end summary  -->
+  </div>
+  <!-- end result-summary -->
+
+  
+  <script type="module">
+    const summary = document.querySelector('#summary');
+    const btncontinue = document.querySelector('#btncontinue');
+    const showAverageScore = document.querySelector('#result');
+    const showSummaryList = document.querySelector('#summaryList'); 
+
+    // for not result
+    function showerror() {
+      showAverageScore.innerHTML = `
+        <div class = "for-No-result">
+          <h1>No Result</h1>
+        </div>
+      `;
+      
+      summary.innerHTML= `
+      <div class = "not-found">
+        <h1>404.</h1>
+        <p>not found</p>
+      </div>
+      
+      `;
+
+    }
+
+    // calculator average score and show average score 
+    function averageScore(data){
+      const totalScore   = data.reduce((sum, item) => sum + item.score, 0);
+      const averageScore = Math.floor(totalScore / data.length);
+
+      // check average score user
+      if(averageScore > 65) {
+        showAverageScore.classList.remove("result--preset-2");
+        showAverageScore.classList.add('result--preset-1');
+
+        // create html and send data
+        showAverageScore.innerHTML = `
+          <h1 class="resultTitle">Your Result</h1>
+
+          <div class="resultScore" id = "resultScore">
+            <h2 class = "averageScore">${averageScore}</h2>
+            <p class = "maxScore">of 100</p>
+          </div>
+
+          <h3 class="resultRank">Great</h3>
+          <p class="resultRankInfo">Your performance exceed 65% of the people conducting the test here!</p>
+        `;
+
+      // check average score user
+      }else{
+        showAverageScore.classList.remove("result--preset-1");
+        showAverageScore.classList.add('result--preset-2');
+
+        // create html and send data
+        showAverageScore.innerHTML = `
+          <h1 class="resultTitle">Your Result</h1>
+
+          <div class="resultScore" id = "resultScore">
+            <h2 class = "averageScore">${averageScore}</h2>
+            <p class = "maxScore">of 100</p>
+          </div>
+
+          <h3 class="resultRank">Not Bad</h3>
+          <p class="resultRankInfo">Your performance exceed 35% of the people conducting the test here!</p>
+        `;
+      }
+    }
+
+    // show list data
+    function listdata(data){
+      data.forEach(user => {
+        let score     = user.score;
+        let category  = user.category;
+        let Image     = user.icon;
+        let locaImage = JSON.stringify(Image);
+
+        // create html and send listdata
+        const listdata = document.createElement('div');
+              listdata.setAttribute('class', 'list');
+              listdata.classList.add('list--' + category)
+          
+              showSummaryList.appendChild(listdata);
+              
+                listdata.innerHTML = `       
+                <img src = ${locaImage} alt = ${category}>
+                <p class = "listName">${category}</p>
+                <p class = "listScore">${score}</p>
+                <p class = "listMaxScore">/ 100</p>
+              `       
+      });
+
+    }
+    
+    // fetch data from ./data.json
+    fetch('./data.json')
+      .then( res  => { return res.json()})
+      .then( data => averageScore(data) | listdata(data))
+      .catch(error => console.log(error)| showerror());
+
+  </script>
+</body>
+</html>
